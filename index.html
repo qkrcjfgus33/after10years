@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html ng-app="after10years" lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="app.css">
+
+	<!-- wysihtml5 parser rules -->
+	<script src="/wysihtml5/parser_rules/advanced.js"></script>
+	<!-- Library -->
+	<script src="/wysihtml5/dist/wysihtml5-0.3.0.min.js"></script>
+
+	<script type="text/javascript" src="lodash.min.js"></script>
+	<script type="text/javascript" src="angular.min.js"></script>
+
+	<script type="text/javascript" src="app.js"></script>
+
+	<style type="text/css" media="print">
+	  @page { size: landscape; }
+	</style>
+</head>
+<body ng-controller="mainCtrl as mainCtrl">
+	<div class="app-cover container-fluid">
+		<div class='col-sm-4'>
+			<span class="app-title">{{mainCtrl.title}}</span>
+		</div>
+		<div class='col-sm-4 header-io hidden-print'>
+			<button type="button" class="btn btn-default" ng-click="mainCtrl.loadData()">
+			  <span class="glyphicon glyphicon-save-file" aria-hidden="true"></span> load
+			</button>
+			<button type="button" class="btn btn-default" ng-click="mainCtrl.saveData()">
+			  <span class="glyphicon glyphicon-open-file" aria-hidden="true"></span> save
+			</button>
+			<button type="button" class="btn btn-default" ng-click="mainCtrl.print()">
+			  <span class="glyphicon glyphicon-print" aria-hidden="true"></span> print
+			</button>
+		</div>
+		<div class='col-sm-4 hidden-print'>
+			<span class="app-author">made by {{mainCtrl.author}}</span>
+		</div>
+	</div>
+
+	<div class="app-plan-board" ng-controller="planBoardCtrl as planBoardCtrl">
+		<div class="year-plan-board">
+			<div class="year-line container-fluid">
+				<div class="year-box col-sm-12">
+					<span>목표</span>
+				</div>
+			</div>
+			<div class="dream-board container-fluid">
+				<div 
+				class="dream-box col-sm-12"
+				ng-click="planBoardCtrl.openEditorDream()"
+				ng-bind-html="planBoardCtrl.trustAsHtml(planBoardCtrl.dream)"
+				></div>
+			</div>
+		</div>
+
+		<div class="year-plan-board" ng-repeat="plan in planBoardCtrl.planCollection" ng-init="yearIndex = $index">
+			<div class="year-line container-fluid">
+				<div class="year-box col-sm-12">
+					<span>{{plan.years}}</span>
+				</div>
+			</div>
+			<div class="month-line container-fluid">
+				<div class="month-box col-sm-1" ng-repeat="month in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']">
+					<span>{{month}}</span>
+				</div>
+			</div>
+			<div class="plan-board container-fluid">
+				<div 
+				class="plan-box col-sm-{{planObj.size}}" 
+				ng-show="planObj.size > 0"
+				ng-repeat="planObj in plan.plans"
+				ng-mouseDown="planBoardCtrl.startPlan($event, yearIndex, $index)"
+				ng-mouseUp="planBoardCtrl.openEditor($event, yearIndex, $index)"
+				ng-bind-html="planBoardCtrl.trustAsHtml(planObj.value)"
+				></div>
+			</div>
+		</div>
+
+		<div class="app-editor" ng-show="planBoardCtrl.showEditor">
+			<div id="wysihtml5-editor-toolbar">
+			  <div class="editor-toolbar-header">
+			    <ul class="commands">
+			      <li data-wysihtml5-command="bold" title="Make text bold (CTRL + B)" class="command"></li>
+			      <li data-wysihtml5-command="italic" title="Make text italic (CTRL + I)" class="command"></li>
+			      <li data-wysihtml5-command="insertUnorderedList" title="Insert an unordered list" class="command"></li>
+			      <li data-wysihtml5-command="insertOrderedList" title="Insert an ordered list" class="command"></li>
+			      <li data-wysihtml5-command="createLink" title="Insert a link" class="command"></li>
+			      <li data-wysihtml5-command="insertImage" title="Insert an image" class="command"></li>
+			      <li data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1" title="Insert headline 1" class="command"></li>
+			      <li data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2" title="Insert headline 2" class="command"></li>
+			      <li data-wysihtml5-command-group="foreColor" class="fore-color" title="Color the selected text" class="command">
+			        <ul>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="silver"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="gray"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="maroon"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="red"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="purple"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="green"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="olive"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="navy"></li>
+			          <li data-wysihtml5-command="foreColor" data-wysihtml5-command-value="blue"></li>
+			        </ul>
+			      </li>
+			      <li data-wysihtml5-command="insertSpeech" title="Insert speech" class="command"></li>
+			      <li data-wysihtml5-action="change_view" title="Show HTML" class="action"></li>
+			    </ul>
+			  </div>
+			  <div data-wysihtml5-dialog="createLink" style="display: none;">
+			    <label>
+			      Link:
+			      <input data-wysihtml5-dialog-field="href" value="http://">
+			    </label>
+			    <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
+			  </div>
+
+			  <div data-wysihtml5-dialog="insertImage" style="display: none;">
+			    <label>
+			      Image:
+			      <input data-wysihtml5-dialog-field="src" value="http://">
+			    </label>
+			    <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
+			  </div>
+			</div>
+			
+			<section class="wysihtml5-editor-textareawrap">
+			  <textarea id="wysihtml5-editor" spellcheck="false" wrap="off" autofocus placeholder="Enter something ..."></textarea>
+			</section>
+			<section class="editor-io">
+				<input type="button" value="취소" ng-click="planBoardCtrl.closeEditor()"/>
+				<input type="button" value="삭제" ng-click="planBoardCtrl.cleanPlan()"/>
+				<input type="button" value="입력" ng-click="planBoardCtrl.editPlan()"/>
+			</section>
+		</div>
+	</div>
+</body>
+</html>
